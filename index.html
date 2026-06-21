@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playoff Translation Lab</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0e27;
+            color: #e0e6ff;
+            line-height: 1.6;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            width: 100%;
+        }
+
+        /* HERO & SEARCH */
+        .hero {
+            padding: 2rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+            border-bottom: 1px solid #2a2f4a;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            margin-bottom: 2rem;
+        }
+
+        .search-box-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            background: #1a1f3a;
+            border: 2px solid #2a2f4a;
+            border-radius: 8px;
+            color: #e0e6ff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 1rem;
+            right: 1rem;
+            margin-top: 0.5rem;
+            background: #1a1f3a;
+            border: 1px solid #2a2f4a;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-dropdown.active {
+            display: block;
+        }
+
+        .search-dropdown-item {
+            padding: 1rem;
+            border-bottom: 1px solid #2a2f4a;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-dropdown-item:hover,
+        .search-dropdown-item.highlighted {
+            background: #2a2f4a;
+        }
+
+        .search-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        /* FEATURED CHIPS */
+        .featured-section {
+            padding: 2rem 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            border-bottom: 1px solid #2a2f4a;
+        }
+
+        .featured-title {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            padding: 0 1rem;
+        }
+
+        .chip {
+            padding: 0.75rem 1.5rem;
+            background: #1a1f3a;
+            border: 1px solid #2a2f4a;
+            border-radius: 20px;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .chip:hover {
+            background: #2a2f4a;
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-area {
+            padding: 2rem 1rem;
+        }
+
+        .player-header {
+            display: none;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: #1a1f3a;
+            border: 1px solid #2a2f4a;
+            border-radius: 12px;
+        }
+
+        .player-header.active {
+            display: block;
+        }
+
+        .player-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #a78bfa;
+        }
+
+        .player-meta {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        /* TABLES */
+        .table-section {
+            display: none;
+            margin-bottom: 2rem;
+        }
+
+        .table-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e0e6ff;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #2a2f4a;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            border: 1px solid #2a2f4a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1a1f3a;
+        }
+
+        thead {
+            background: #2a2f4a;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #a0aec0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #3a3f5a;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #2a2f4a;
+            font-size: 0.95rem;
+        }
+
+        tbody tr:hover {
+            background: #2a2f4a;
+        }
+
+        .expandable-row {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expandable-row:hover {
+            background: #2a2f4a !important;
+        }
+
+        .expand-indicator {
+            display: inline-block;
+            margin-right: 0.5rem;
+            transition: transform 0.3s;
+        }
+
+        .expand-indicator.open {
+            transform: rotate(90deg);
+        }
+
+        .stat-cell {
+            font-weight: 500;
+            color: #60a5fa;
+        }
+
+        .stat-positive {
+            color: #4ade80;
+        }
+
+        .stat-negative {
+            color: #f87171;
+        }
+
+        .stat-missing {
+            color: #64748b;
+        }
+
+        /* EXPANDABLE ROWS */
+        .child-rows {
+            display: none;
+        }
+
+        .child-rows.open {
+            display: table-row-group;
+        }
+
+        .child-row {
+            background: rgba(42, 47, 74, 0.5);
+        }
+
+        .child-row td {
+            padding-left: 2rem;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #64748b;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* DATA SOURCES */
+        .data-sources {
+            padding: 2rem 1rem;
+            background: #1a1f3a;
+            border-top: 1px solid #2a2f4a;
+            margin-top: 2rem;
+        }
+
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .source-card {
+            padding: 1.5rem;
+            background: #0a0e27;
+            border: 1px solid #2a2f4a;
+            border-radius: 8px;
+        }
+
+        .source-name {
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 0.5rem;
+        }
+
+        .source-stats {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0.5rem 0;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #2a2f4a;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .chips-container {
+                gap: 0.75rem;
+            }
+
+            .chip {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.8rem;
+            }
+
+            .player-name {
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.4rem 0.2rem;
+            }
+
+            .search-input {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO & SEARCH -->
+    <div class="hero">
+        <div class="container">
+            <h1>Playoff Translation Lab</h1>
+            <p>Search a player. See the playoff context.</p>
+            <div class="search-box-container">
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Search players... (e.g., lebr, curry, jokic)"
+                    autocomplete="off"
+                >
+                <div id="searchDropdown" class="search-dropdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURED CHIPS -->
+    <div class="featured-section">
+        <div class="container">
+            <div class="featured-title">Featured Players</div>
+            <div class="chips-container" id="chipsContainer"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="content-area">
+            <div class="player-header" id="playerHeader">
+                <div class="player-name" id="playerName"></div>
+                <div class="player-meta" id="playerMeta"></div>
+            </div>
+
+            <!-- SEASON TRANSLATION TABLE -->
+            <div id="seasonSection" class="table-section">
+                <div class="section-title">Playoff Seasons</div>
+                <div class="table-wrapper">
+                    <table id="seasonTable">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>MIN</th>
+                                <th>PTS/75</th>
+                                <th>REB/75</th>
+                                <th>AST/75</th>
+                                <th>TOV/75</th>
+                                <th>TS%</th>
+                                <th>eFG%</th>
+                                <th>ORTG</th>
+                                <th>DRTG</th>
+                                <th>NET</th>
+                            </tr>
+                        </thead>
+                        <tbody id="seasonTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SERIES BREAKDOWN -->
+            <div id="seriesSection" class="table-section">
+                <div class="section-title">Series Breakdown</div>
+                <div id="seriesMessage" class="empty-state">
+                    <p>Series data will appear when available.</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="seriesTable">
+                        <thead>
+                            <tr>
+                                <th>Round</th>
+                                <th>MIN</th>
+                                <th>PTS/75</th>
+                                <th>REB/75</th>
+                                <th>AST/75</th>
+                                <th>TOV/75</th>
+                                <th>TS%</th>
+                                <th>eFG%</th>
+                                <th>NET</th>
+                            </tr>
+                        </thead>
+                        <tbody id="seriesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GAME LOG -->
+            <div id="gameSection" class="table-section">
+                <div class="section-title">Game Log</div>
+                <div id="gameMessage" class="empty-state">
+                    <p>Game logs will appear when available.</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="gameTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>vs</th>
+                                <th>MIN</th>
+                                <th>PTS</th>
+                                <th>REB</th>
+                                <th>AST</th>
+                                <th>TS%</th>
+                                <th>eFG%</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gameTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ON-COURT IMPACT -->
+            <div id="impactSection" class="table-section">
+                <div class="section-title">On-Court Impact</div>
+                <div id="impactMessage" class="empty-state">
+                    <p>Advanced impact metrics will appear when available.</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="impactTable">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="impactTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SKILL SPLITS -->
+            <div id="skillSection" class="table-section">
+                <div class="section-title">Shot Profile & Playmaking</div>
+                <div id="skillMessage" class="empty-state">
+                    <p>Detailed skill split data will appear when available.</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="skillTable">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Frequency</th>
+                                <th>Efficiency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skillTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RANKINGS -->
+            <div id="rankingsSection" class="table-section">
+                <div class="section-title">Rankings</div>
+                <div id="rankingsMessage" class="empty-state">
+                    <p>Player rankings by category will appear when available.</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="rankingsTable">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Rank</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATA SOURCES -->
+        <div class="data-sources">
+            <div class="container">
+                <div class="section-title">Data Sources</div>
+                <div class="sources-grid" id="sourcesGrid"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>Playoff Translation Lab &copy; 2026. Data from Gabriel1200's public repositories.</p>
+    </footer>
+
+    <!-- EMBEDDED DATA PACKAGE -->
+    <script id="dataPackage" type="application/json">
+    {
+        "version": "1.0",
+        "generated": "2026-06-21",
+        "players": {},
+        "playerSeasons": [],
+        "playerSeries": [],
+        "playerGames": [],
+        "teamBenchmarks": [],
+        "playerImpact": [],
+        "playerSkillSplits": [],
+        "rankings": [],
+        "metadata": {
+            "targetYears": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+            "featuredPlayers": [
+                "LeBron James",
+                "Stephen Curry",
+                "Nikola Jokic",
+                "Kobe Bryant",
+                "Kevin Durant",
+                "Giannis Antetokounmpo",
+                "Tim Duncan",
+                "Shaquille O'Neal",
+                "Michael Jordan",
+                "Dwyane Wade",
+                "James Harden",
+                "Luka Doncic"
+            ],
+            "sourceRepos": [
+                "site_Data",
+                "player_sheets",
+                "merged_playbyplay",
+                "pbpbacklog",
+                "legacy_pbp"
+            ]
+        }
+    }
+    </script>
+
+    <script>
+        // ======================================================================
+        // DATA LOADING
+        // ======================================================================
+
+        let dataPackage = {};
+        let allPlayers = [];
+
+        function loadData() {
+            const scriptEl = document.getElementById('dataPackage');
+            dataPackage = JSON.parse(scriptEl.textContent);
+            allPlayers = Object.keys(dataPackage.players).map(id => ({
+                id,
+                name: dataPackage.players[id].name,
+                featured: dataPackage.players[id].featured
+            })).sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        // ======================================================================
+        // SEARCH & DROPDOWN
+        // ======================================================================
+
+        const searchInput = document.getElementById('searchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+
+        function filterPlayers(query) {
+            if (!query) return allPlayers;
+            const lowerQuery = query.toLowerCase();
+            return allPlayers.filter(p => p.name.toLowerCase().includes(lowerQuery));
+        }
+
+        function renderSearchDropdown(query) {
+            const filtered = filterPlayers(query);
+            searchDropdown.innerHTML = '';
+
+            if (filtered.length === 0) {
+                searchDropdown.innerHTML = '<div class="search-dropdown-item" style="color: #64748b; pointer-events: none;">No players found</div>';
+                return;
+            }
+
+            filtered.slice(0, 12).forEach((player, idx) => {
+                const item = document.createElement('div');
+                item.className = 'search-dropdown-item';
+                if (idx === 0) item.classList.add('highlighted');
+                item.textContent = player.name;
+                item.addEventListener('click', () => selectPlayer(player.id));
+                searchDropdown.appendChild(item);
+            });
+        }
+
+        function toggleSearchDropdown(show) {
+            searchDropdown.classList.toggle('active', show);
+        }
+
+        searchInput.addEventListener('focus', () => {
+            toggleSearchDropdown(true);
+            if (searchInput.value) renderSearchDropdown(searchInput.value);
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            toggleSearchDropdown(true);
+            renderSearchDropdown(query);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const items = searchDropdown.querySelectorAll('.search-dropdown-item');
+                if (items.length > 0) {
+                    const highlighted = searchDropdown.querySelector('.search-dropdown-item.highlighted');
+                    if (highlighted) highlighted.click();
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-box-container')) {
+                toggleSearchDropdown(false);
+            }
+        });
+
+        // ======================================================================
+        // FEATURED CHIPS
+        // ======================================================================
+
+        function renderFeaturedChips() {
+            const container = document.getElementById('chipsContainer');
+            const featured = allPlayers.filter(p => p.featured);
+            container.innerHTML = featured.map(player => `
+                <div class="chip" onclick="selectPlayer('${player.id}')">${player.name}</div>
+            `).join('');
+        }
+
+        // ======================================================================
+        // PLAYER PROFILE
+        // ======================================================================
+
+        function selectPlayer(playerId) {
+            searchInput.value = '';
+            toggleSearchDropdown(false);
+
+            const player = dataPackage.players[playerId];
+            if (!player) return;
+
+            // Show header
+            document.getElementById('playerHeader').classList.add('active');
+            document.getElementById('playerName').textContent = player.name;
+            document.getElementById('playerMeta').textContent = player.featured ? '⭐ Featured Player' : 'Playoff Player';
+
+            // Render seasons
+            const seasons = dataPackage.playerSeasons.filter(s => s.playerId === playerId);
+            renderSeasonTable(seasons);
+
+            // Render series
+            const series = dataPackage.playerSeries.filter(s => s.playerId === playerId);
+            renderSeriesTable(series);
+
+            // Render games
+            const games = dataPackage.playerGames.filter(g => g.playerId === playerId);
+            renderGameTable(games);
+
+            // Render impact
+            const impact = dataPackage.playerImpact.filter(i => i.playerId === playerId);
+            renderImpactTable(impact);
+
+            // Render skills
+            const skills = dataPackage.playerSkillSplits.filter(s => s.playerId === playerId);
+            renderSkillTable(skills);
+
+            // Show appropriate sections
+            document.getElementById('seasonSection').classList.add('active');
+            document.getElementById('seriesSection').classList.add('active');
+            document.getElementById('gameSection').classList.add('active');
+            document.getElementById('impactSection').classList.add('active');
+            document.getElementById('skillSection').classList.add('active');
+            document.getElementById('rankingsSection').classList.add('active');
+
+            // Scroll to player
+            document.getElementById('playerHeader').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderSeasonTable(seasons) {
+            const tbody = document.getElementById('seasonTableBody');
+            tbody.innerHTML = '';
+
+            if (seasons.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #64748b; padding: 2rem;">No season data available</td></tr>';
+                return;
+            }
+
+            seasons.sort((a, b) => b.year - a.year).forEach(season => {
+                const row = `
+                    <tr class="expandable-row" onclick="toggleSeriesExpand(this)">
+                        <td><span class="expand-indicator">›</span>${season.year}</td>
+                        <td class="stat-cell">${formatStat(season.MIN)}</td>
+                        <td class="stat-cell">${formatStat(season['PTS/75'])}</td>
+                        <td class="stat-cell">${formatStat(season['REB/75'])}</td>
+                        <td class="stat-cell">${formatStat(season['AST/75'])}</td>
+                        <td class="stat-cell">${formatStat(season['TOV/75'])}</td>
+                        <td class="stat-cell">${formatStat(season['TS%'])}</td>
+                        <td class="stat-cell">${formatStat(season['eFG%'])}</td>
+                        <td class="stat-cell">${formatStat(season.ORTG)}</td>
+                        <td class="stat-cell">${formatStat(season.DRTG)}</td>
+                        <td class="stat-cell">${formatStat(season.NET)}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function renderSeriesTable(series) {
+            const tbody = document.getElementById('seriesTableBody');
+            if (series.length === 0) {
+                document.getElementById('seriesMessage').style.display = 'block';
+                tbody.style.display = 'none';
+                return;
+            }
+            document.getElementById('seriesMessage').style.display = 'none';
+            tbody.style.display = '';
+            tbody.innerHTML = series.map(s => `
+                <tr>
+                    <td>${s.round || '—'}</td>
+                    <td class="stat-cell">${formatStat(s.MIN)}</td>
+                    <td class="stat-cell">${formatStat(s['PTS/75'])}</td>
+                    <td class="stat-cell">${formatStat(s['REB/75'])}</td>
+                    <td class="stat-cell">${formatStat(s['AST/75'])}</td>
+                    <td class="stat-cell">${formatStat(s['TOV/75'])}</td>
+                    <td class="stat-cell">${formatStat(s['TS%'])}</td>
+                    <td class="stat-cell">${formatStat(s['eFG%'])}</td>
+                    <td class="stat-cell">${formatStat(s.NET)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderGameTable(games) {
+            const tbody = document.getElementById('gameTableBody');
+            if (games.length === 0) {
+                document.getElementById('gameMessage').style.display = 'block';
+                tbody.style.display = 'none';
+                return;
+            }
+            document.getElementById('gameMessage').style.display = 'none';
+            tbody.style.display = '';
+            tbody.innerHTML = games.map(g => `
+                <tr>
+                    <td>${g.date || '—'}</td>
+                    <td>${g.opponent || '—'}</td>
+                    <td class="stat-cell">${formatStat(g.MIN)}</td>
+                    <td class="stat-cell">${formatStat(g.PTS)}</td>
+                    <td class="stat-cell">${formatStat(g.REB)}</td>
+                    <td class="stat-cell">${formatStat(g.AST)}</td>
+                    <td class="stat-cell">${formatStat(g['TS%'])}</td>
+                    <td class="stat-cell">${formatStat(g['eFG%'])}</td>
+                    <td>${g.result || '—'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderImpactTable(impact) {
+            const tbody = document.getElementById('impactTableBody');
+            if (impact.length === 0) {
+                document.getElementById('impactMessage').style.display = 'block';
+                tbody.style.display = 'none';
+                return;
+            }
+            document.getElementById('impactMessage').style.display = 'none';
+            tbody.style.display = '';
+            tbody.innerHTML = impact.map(i => `
+                <tr>
+                    <td>${i.metric || '—'}</td>
+                    <td class="stat-cell">${formatStat(i.value)}</td>
+                    <td>${i.level || '—'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSkillTable(skills) {
+            const tbody = document.getElementById('skillTableBody');
+            if (skills.length === 0) {
+                document.getElementById('skillMessage').style.display = 'block';
+                tbody.style.display = 'none';
+                return;
+            }
+            document.getElementById('skillMessage').style.display = 'none';
+            tbody.style.display = '';
+            tbody.innerHTML = skills.map(s => `
+                <tr>
+                    <td>${s.category || '—'}</td>
+                    <td class="stat-cell">${formatStat(s.frequency)}</td>
+                    <td class="stat-cell">${formatStat(s.efficiency)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatStat(val) {
+            if (val === null || val === undefined || val === '') return '—';
+            if (typeof val === 'number') {
+                return val.toFixed(1);
+            }
+            return val;
+        }
+
+        // ======================================================================
+        // INITIALIZATION
+        // ======================================================================
+
+        loadData();
+        renderFeaturedChips();
+
+        // Pre-select a featured player for demo
+        if (allPlayers.length > 0) {
+            const lebron = allPlayers.find(p => p.name.includes('LeBron'));
+            if (lebron) {
+                setTimeout(() => selectPlayer(lebron.id), 300);
+            }
+        }
+    </script>
+</body>
+</html>
