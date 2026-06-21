@@ -1,0 +1,162 @@
+{
+  "version": "1.0",
+  "generated": "2026-06-21",
+  "sources": {
+    "site_Data": {
+      "repo": "https://github.com/gabriel1200/site_Data",
+      "description": "Primary site data and player information repository",
+      "status": "active",
+      "files_used": [],
+      "row_count": 0,
+      "last_updated": "2026-06-21"
+    },
+    "player_sheets": {
+      "repo": "https://github.com/gabriel1200/player_sheets",
+      "description": "Player stats and playoff performance sheets",
+      "status": "active",
+      "priority_folders": [
+        "game_report/",
+        "teamgame_report/",
+        "series/",
+        "series/team/",
+        "year_totals/",
+        "totals/",
+        "team_totals/"
+      ],
+      "files_used": [],
+      "row_count": 0,
+      "last_updated": "2026-06-21"
+    },
+    "merged_playbyplay": {
+      "repo": "https://github.com/gabriel1200/merged_playbyplay",
+      "description": "Merged play-by-play data for playoff games",
+      "status": "active",
+      "files_used": [],
+      "row_count": 0,
+      "last_updated": "2026-06-21"
+    },
+    "pbpbacklog": {
+      "repo": "https://github.com/gabriel1200/pbpbacklog",
+      "description": "Play-by-play backlog data",
+      "status": "active",
+      "files_used": [],
+      "row_count": 0,
+      "last_updated": "2026-06-21"
+    },
+    "legacy_pbp": {
+      "repo": "https://github.com/gabriel1200/legacy_pbp",
+      "description": "Legacy play-by-play data for historical playoff context",
+      "status": "active",
+      "files_used": [],
+      "row_count": 0,
+      "last_updated": "2026-06-21"
+    }
+  },
+  "metrics": {
+    "real_metrics": [
+      "MIN",
+      "PTS/75",
+      "REB/75",
+      "AST/75",
+      "TOV/75",
+      "TS%",
+      "eFG%",
+      "ORTG",
+      "DRTG",
+      "NET"
+    ],
+    "context_only_metrics": [
+      "Opponent Team",
+      "Series Round",
+      "Game Date",
+      "Win/Loss"
+    ],
+    "unavailable_metrics": [
+      "Game-level shot location data",
+      "Real-time tracking data",
+      "Advanced defensive metrics (RAPM, DRtg variants)",
+      "2K ratings"
+    ]
+  },
+  "rules_applied": {
+    "no_rapm2k": true,
+    "no_2k_related": true,
+    "no_brescou_breacou": true,
+    "no_fabricated_stats": true,
+    "missing_stats_show_em_dash": true,
+    "target_years": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+  },
+  "stat_calculations": {
+    "PTS_75": {
+      "description": "Points per 75 possessions",
+      "formula": "IF per_100_available THEN (PTS_per_100 * 0.75) ELSE (Points / OffPoss * 75)",
+      "level": "season/series/game"
+    },
+    "AST_75": {
+      "description": "Assists per 75 possessions",
+      "formula": "IF per_100_available THEN (AST_per_100 * 0.75) ELSE (Assists / OffPoss * 75)",
+      "level": "season/series/game"
+    },
+    "REB_75": {
+      "description": "Rebounds per 75 possessions",
+      "formula": "IF rebounds_and_possessions_available THEN (Rebounds / OffPoss * 75)",
+      "level": "season/series/game"
+    },
+    "TOV_75": {
+      "description": "Turnovers per 75 possessions",
+      "formula": "IF per_100_available THEN (TOV_per_100 * 0.75) ELSE (Turnovers / OffPoss * 75)",
+      "level": "season/series/game"
+    },
+    "relative_TS": {
+      "description": "Relative True Shooting %",
+      "formula": "playerTS - opponentAllowedTS",
+      "level": "season/series"
+    },
+    "relative_EFG": {
+      "description": "Relative Effective FG%",
+      "formula": "playerEFG - opponentAllowedEFG",
+      "level": "season/series"
+    },
+    "relative_ORTG": {
+      "description": "Relative Offensive Rating",
+      "formula": "playerORTG - opponentDefensiveBenchmark",
+      "level": "season/series"
+    },
+    "relative_DRTG": {
+      "description": "Relative Defensive Rating",
+      "formula": "opponentOffensiveBenchmark - playerDRTG",
+      "level": "season/series"
+    },
+    "NET": {
+      "description": "Net Rating (Offensive - Defensive)",
+      "formula": "ORTG - DRTG",
+      "level": "season/series/game"
+    }
+  },
+  "data_hierarchy": {
+    "level_1": "Player",
+    "level_2": "Playoff Year",
+    "level_3": "Series/Round",
+    "level_4": "Individual Game"
+  },
+  "ui_sections": [
+    "Hero/Search",
+    "Player Header",
+    "Season Translation Table",
+    "Series Breakdown",
+    "Game Log",
+    "On-Court Impact",
+    "Shot Profile",
+    "Playmaking Pressure",
+    "Defensive Activity",
+    "Rankings",
+    "Data Sources"
+  ],
+  "known_limitations": [
+    "Game-level data may be incomplete for pre-2000 seasons",
+    "Some series data requires manual aggregation from game logs",
+    "Missing stats for players with limited playoff appearances",
+    "Historical stat definitions may vary by year",
+    "Advanced metrics only available for recent seasons"
+  ]
+}
